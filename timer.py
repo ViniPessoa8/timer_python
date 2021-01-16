@@ -23,8 +23,8 @@ class App:
         self.contador.pack(ipady=30)
 
         # --- Contador ---
-        self.horasTimerEntrada = tk.Entry(self.contador, width=2, font=("Arial",18,""), ,textvariable=self.formatarNumero(self.horasTimer))
-        self.horasTimerEntrada.
+        self.horasTimerEntrada = tk.Entry(self.contador, width=2, font=("Arial",18,""), textvariable=self.formatarNumero(self.horasTimer))
+        # self.horasTimerEntrada.
         # hourEntry.place(x=80,y=20)
         self.horasTimerEntrada.pack(side='left', padx=5)
 
@@ -62,11 +62,12 @@ class App:
         self.sair["command"] = self.widget1.quit
         self.sair.pack ()
 
-    def iniciarTimer(arg1, arg2):
+    def iniciarTimer(self, arg2):
         timerIniciado = True
+        arg1.btnMudarTexto['text'] = 'Parar'
         while (timerIniciado):
-          arg1.mostrarTempo(arg1)
-          arg1.passarTempo()
+          self.mostrarTempo(self)
+          self.passarTempo()
           time.sleep(1)
           
 
@@ -91,8 +92,8 @@ class App:
             return '0'+str(num)
         return str(num)
 
-    def mostrarTempo(arg1, arg2):
-        print(''+ arg1.formatarNumero(arg1.horasTimer) + ':' + arg1.formatarNumero(arg1.minutosTimer) + ':' + arg1.formatarNumero(arg1.segundosTimer))
+    def mostrarTempo(self, arg2):
+        print(''+ self.formatarNumero(self.horasTimer) + ':' + self.formatarNumero(self.minutosTimer) + ':' + self.formatarNumero(self.segundosTimer))
 
     def atualizaContador(self):
         print(self.horasTimerEntrada.get())
@@ -106,7 +107,7 @@ class App:
         # print(arg2)
         # print(self.horasTimer)
     
-    def formatTimer(arg1):
+    def formatTimer(self, arg1):
         print(arg1)
         return '-'
 
