@@ -2,16 +2,10 @@ import time
 import tkinter as tk
 
 class App:
-    
     def __init__(self, master=None):
-        
         self.segundosTimer = 58
         self.minutosTimer = 0
         self.horasTimer = 0
-
-        # self.segundosTimer.set('00')
-        # self.minutosTimer.set('00')
-        # self.horasTimer.set('00')
 
         # Cria o widget 1
         self.widget1 = tk.Frame(master)
@@ -24,8 +18,6 @@ class App:
 
         # --- Contador ---
         self.horasTimerEntrada = tk.Entry(self.contador, width=2, font=("Arial",18,""), textvariable=self.formatarNumero(self.horasTimer))
-        # self.horasTimerEntrada.
-        # hourEntry.place(x=80,y=20)
         self.horasTimerEntrada.pack(side='left', padx=5)
 
         labelDoisPontos1 = tk.Label(self.contador, text=':')
@@ -63,29 +55,33 @@ class App:
         self.sair.pack ()
 
     def iniciarTimer(self, arg2):
-        timerIniciado = True
-        arg1.btnMudarTexto['text'] = 'Parar'
-        while (timerIniciado):
-          self.mostrarTempo(self)
-          self.passarTempo()
-          time.sleep(1)
+        print('Iniciar Timer')
+        self.timerIniciado = True
+        self.btnMudarTexto['text'] = 'Parar'
+        
+        self.passarTempo()
+        self.btnMudarTexto['text'] = 'Iniciar'
           
 
-    def passarTempo(self):
-        # A cada segundo
-        self.segundosTimer += 1
-        if (self.segundosTimer == 60):
-            self.segundosTimer = 0
-            self.minutosTimer += 1
+    async def passarTempo(self):
+        print("Passar tempo")
+        while (self.timerIniciado):
+            self.mostrarTempo(self)
+            time.sleep(1)
+            self.segundosTimer += 1 # A cada segundo
+            
+            if (self.segundosTimer == 60):
+                self.segundosTimer = 0
+                self.minutosTimer += 1
 
-        if (self.minutosTimer == 60):
-            self.minutosTimer = 0
-            self.horasTimer += 1
+            if (self.minutosTimer == 60):
+                self.minutosTimer = 0
+                self.horasTimer += 1
 
-        if (self.horasTimer == 24):
-            self.horasTimer = 0
+            if (self.horasTimer == 24):
+                self.horasTimer = 0
 
-        self.atualizaContador()
+            self.atualizaContador()
 
     def formatarNumero(self, num):
         if (num < 10):
