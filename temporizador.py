@@ -6,57 +6,96 @@ import datetime
 import math 
 
 class Temporizador:
-    def __init__(self, master=None):
-        self.parar()
+    
+    def __init__(self, master=None, stopkey='esc', label='-', minutos=0, segundos=0):
+        # Instanciação das variáveis
+        self.executando = True
+        self.temporizando = False
+        self.reiniciado = False
 
-    def temporizar(self, minutos, segundos, label):
-        """
-        função que inicia um temporizador, dado os minutos e segundos como parâmetros
-        """
-        self.rodando = True
+        # Tempo inicial
+        self.min_inic = minutos
+        self.seg_inic = segundos
 
-        print('Temporizando ' + self.formatar_saida(minutos,segundos))
-        print(label + ': ' + self.formatar_saida(minutos,segundos))
+        # Tempo atual (usado na contagem)
+        self.min_atual = self.min_inic
+        self.seg_atual = self.seg_inic
         
-        while (self.rodando):
-            if (segundos > 0):
-                segundos -= 1
-            elif (minutos > 0):
-                minutos -= 1
-                segundos = 59
-            else:
-                self.parar()
-                print("Fim!")
+        # Strings
+        self.label = label
+        self.stop_key = stopkey
+        self.start_key = 'space'
+        self.restart_key = 'r'
 
-            time.sleep(1)
-            print(label + ': ' + self.formatar_saida(minutos,segundos))
+        # Threads
+        self.tInput = th.Thread(name='Input-Thread('+stopkey+')', target=self.ler_entrada) # Lê o teclado 
+        self.tTemporizador = th.Thread(name='Temporizador-Thread('+label+')', target=self.temporizar) # Inicia o temporizador
+
+        self.tInput.start()
+        self.tTemporizador.start()
+
+        print('\n')
+        self.printar_saida()
+        self.printar_comandos()
+
+    def mudar_status(self):
+        self.temporizando = not self.temporizando
+
+        if (self.temporizando):
+            print('Ativado!')
+        else:
+            print('Parado!')
+
+    def reiniciar(self):
+        os.system('cls')
+        self.min_atual = self.min_inic
+        self.seg_atual = self.seg_inic
+        self.reiniciado = True
         
+        print("Reiniciado!")
+        self.printar_saida()
+        self.printar_comandos()
+
+    def temporizar(self):
+        """
+        função que inicia o temporizador
+        """
+        while(self.executando):
+            while(self.temporizando):
+                # print(label + ': ' + self.formatar_saida(self.min_atual, self.seg_atual))
+                if (not self.reiniciado):
+                    self.printar_saida()
+                else:
+                    self.reiniciado = False
+                
+                if (self.seg_atual > 0):
+                    self.seg_atual -= 1
+                elif (self.min_atual > 0):
+                    self.min_atual -= 1
+                    self.seg_atual = 59
+                else:
+                    self.parar()
+                    print("Fim!")
+
+                time.sleep(1)
+
+    def finalizar(self):
+        self.temporizando = False
+        self.executando = False
+        print('Finalizado!')
+
     def ler_entrada(self):
         """
-        função que monitora o teclado e para o timer caso o usuário tecle 'Esc' 
+        função que monitora o teclado e para o timer caso o usuário tecle a 'stopkey' 
         """
-        keyboard.add_hotkey('esc', self.parar)
-
-    def iniciar_threads(self):
-        """
-        função que inicia todas as threads
-        """
-        self.inicia_thread_timer(1,0,'a') # Thread de timer em um minuto (01:00) 
+        # Tecla que inicia o timer 
+        keyboard.add_hotkey(self.start_key, self.mudar_status)
         
-        # Thread para ler a entrada do usuário enquanto o timer é executado
-        tInput = th.Thread(target=self.ler_entrada)
-        tInput.start()
+        # Tecla que para o timer
+        keyboard.add_hotkey(self.stop_key, self.finalizar)
 
-    def inicia_thread_timer(self, mins, secs, label):
-        """
-        Inicia uma thread que instancia um timer com o tempo fornecido
-        
-        mins = minutos 
-        secs = segundos
-        label = texto indetificador de cada Thread
-        """
-        t = th.Thread(target=self.temporizar, args=(mins, secs, label))
-        t.start()
+        # Tecla para reiniciar o timer
+        keyboard.add_hotkey(self.restart_key, self.reiniciar)
 
     def formatar_saida(self, minutos, segundos):
         """
@@ -76,19 +115,13 @@ class Temporizador:
         txt_result = txt_min + ':' + txt_seg
         return txt_result
 
-    def parar(self):
-        """
-        função que para todos os timers
-        """
-        self.rodando = False
+    def printar_saida(self):
+        print(self.label + ': ' + self.formatar_saida(self.min_atual, self.seg_atual))
 
-    def main(self):
-        """
-        função principal
-        """
-        self.iniciar_threads()
+    def printar_comandos(self):
+        print('espaço -> On/Off\nr -> reinicia o timer\nesc -> finaliza o timer\n')
 
 if __name__ == '__main__':
-    temp1 = Temporizador()
-
-    temp1.main()
+    temp1 = Temporizador(label='temporizador-1', stopkey='esc', minutos=1, segundos=0)
+    temp1.mudar_status()
+    temp1.tTemporizador.join()
