@@ -26,7 +26,6 @@ class Controlador:
                     time.sleep(1)
 
     ### THREADS ###
-
     def finaliza_temporizador(self, index):
         temp = self.temporizadores[index] 
         temp.finalizar()
@@ -34,13 +33,6 @@ class Controlador:
 
     def ler_entrada(self):
         keyboard.add_hotkey(hotkey='esc', callback=self.finaliza_temporizador, args=(0,))
-
-    def main(self):
-        """
-        função principal
-        """
-        # print(th.current_thread()._ident)
-        # self.iniciar_threads() 
 
 if __name__ == '__main__':
     ctrl = Controlador()
@@ -59,6 +51,4 @@ if __name__ == '__main__':
 
     t_saida_temporizador.start()
     t_entrada.start()
-    # while (temp.temporizando):
-    #     print(temp.get_tempo())
-    #     time.sleep(1)
+    t_saida_temporizador.join()
