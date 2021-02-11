@@ -57,6 +57,7 @@ class Temporizador:
         print('__temporizar()')
         while(self.executando):
             while(self.temporizando):
+                time.sleep(1)
                 if (self.reiniciado):
                 #     continue
                 #     # self.__printar_saida()
@@ -72,7 +73,7 @@ class Temporizador:
                     self.mudar_status()
                     print("Fim!")
 
-                time.sleep(1)
+                
 
     def finalizar(self):
         self.temporizando = False
