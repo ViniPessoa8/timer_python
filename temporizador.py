@@ -42,7 +42,6 @@ class Temporizador:
             print('Parado!')
 
     def reiniciar(self):
-        os.system('cls')
         self.min_atual = self.min_inic
         self.seg_atual = self.seg_inic
         self.reiniciado = True
