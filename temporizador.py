@@ -38,9 +38,9 @@ class Temporizador:
         self.temporizando = not self.temporizando
 
         if (self.temporizando):
-            print('Ativado!')
+            print('[TEMPORIZADOR] Ativado!')
         else:
-            print('Pausado!')
+            print('[TEMPORIZADOR] Pausado!')
 
     def reiniciar(self):
         self.executando = True
@@ -51,14 +51,14 @@ class Temporizador:
         self.min_atual = self.min_inic
         self.seg_atual = self.seg_inic
         
-        print("Reiniciado!")
+        print("[TEMPORIZADOR] Reiniciado!")
         self.__printar_saida()
 
     def __temporizar(self):
         """
         função que inicia o temporizador
         """
-        print('__temporizar()')
+        print('[TEMPORIZADOR] __temporizar()')
         while(self.executando):
             while(self.temporizando and not self.parado):
                 time.sleep(1)
@@ -76,12 +76,12 @@ class Temporizador:
                 else:
                     self.mudar_status()
                     self.parado = True
-                    print("Fim!")
+                    print("[TEMPORIZADOR] Fim!")
 
     def finalizar(self):
         self.temporizando = False
         self.executando = False
-        print('Finalizado!')
+        print('[TEMPORIZADOR] Finalizado!')
 
     def __formatar_saida(self, minutos, segundos):
         """
@@ -114,10 +114,10 @@ class Temporizador:
         return self.temporizando
 
     def __printar_saida(self):
-        print(self.label + ': ' + self.__formatar_saida(self.min_atual, self.seg_atual))
+        print('[TEMPORIZADOR] '+self.label + ': ' + self.__formatar_saida(self.min_atual, self.seg_atual))
 
     def __printar_comandos(self):
-        print('espaço -> On/Off\nr -> reinicia o timer\nesc -> finaliza o timer\n')
+        print('[TEMPORIZADOR] espaço -> On/Off\nr -> reinicia o timer\nesc -> finaliza o timer\n')
 
 if __name__ == '__main__':
     temp1 = Temporizador(label='temporizador-1', minutos=1, segundos=0)
