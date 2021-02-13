@@ -22,6 +22,7 @@ class Interface:
         # Variáveis
         self.tempo_atual = StringVar(value=temporizador.get_tempo())
         self.texto_botao = StringVar(value='Iniciar')
+        self.log = StringVar(value='-')
 
         # Frame
         self.content = Frame(self.root, width=200, height=300)
@@ -34,11 +35,13 @@ class Interface:
         self.b_iniciar = Button(self.content, textvariable=self.texto_botao, command=self.mudar_status)
         self.txt_temporizador_1 = Label(self.content, textvariable=self.tempo_atual, width=5)
         self.b_reiniciar = Button(self.content, command=self.reinicia_temporizador, image=self.restart_icon)
+        self.log_label = Label(self.content, textvariable=self.log)
 
         # Mostrando os Widgets
         self.b_iniciar.grid(column=1, row=1, sticky=(E))
         self.txt_temporizador_1.grid(column=2, row=1, sticky=(W, E))
         self.b_reiniciar.grid(column=3, row=1, sticky=(W))
+        self.log_label.grid(column=2, row=2, sticky=(N))
 
         # Configurações Adicionais
         for child in self.content.winfo_children(): 
@@ -67,6 +70,8 @@ class Interface:
         '''
         Coloca o temporizador no seu estado inicial.
         '''
+        self.log_txt('[INTERFACE] inicia_temporizador()')
+
         self.texto_botao.set('Iniciar') 
         self.temporizando = False
         self.b_reiniciar['state'] = DISABLED
@@ -122,6 +127,9 @@ class Interface:
         self.t_atualiza_tempo = th.Thread(target=self.t_atualiza_tempo)
         self.t_atualiza_tempo.start()
         self.iniciar()
+
+    def log_txt(self, txt):
+        self.log.set(txt)
 
     def __del__(self):
         '''
