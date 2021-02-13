@@ -41,14 +41,18 @@ class Interface:
         self.b_reiniciar.grid(column=3, row=1, sticky=(W))
 
         # Configurações Adicionais
-        self.b_reiniciar['state'] = DISABLED
         for child in self.content.winfo_children(): 
             child.grid_configure(padx=5, pady=5)
 
+        self.inicia_temporizador()
         self.inicia_threads()
 
     # Funções
     def mudar_status(self):
+        '''
+        Muda o status do temporizador. 
+        Acionado ao clicar o botão "Iniciar".
+        '''
         self.b_reiniciar['state'] = NORMAL
         if (self.temporizando):
             self.texto_botao.set('Iniciar')
@@ -59,50 +63,70 @@ class Interface:
             self.texto_botao.set('Parar')
             self.temporizando = True
 
-    def iniciar_temporizador(self):
+    def inicia_temporizador(self):
+        '''
+        Coloca o temporizador no seu estado inicial.
+        '''
         self.texto_botao.set('Iniciar') 
         self.temporizando = False
-        self.b_reiniciar['state'] = NORMAL
-
-    def para_temporizador(self):
-        self.b_iniciar['state'] = DISABLED
-        self.temporizando = False
-
-    def finaliza_temporizador(self):
-        self.temporizador.mudar_status()
-        self.texto_botao.set('Parar')
-        self.temporizando = True
-
-    def atualiza_tempo(self, tempo):
-        self.tempo_atual.set(tempo)
-
-    def reinicia_temporizador(self):
-        self.temporizando = False
-        self.texto_botao.set('Iniciar')
-
         self.b_reiniciar['state'] = DISABLED
         self.b_iniciar['state'] = NORMAL
 
+    def para_temporizador(self):
+        '''
+        Coloca o temporizador no estado parado.
+        O botão 'Iniciar' é desabilitado e a temporização interrompida.
+        '''
+        self.b_iniciar['state'] = DISABLED
+        self.temporizando = False
+
+    def atualiza_tempo(self, tempo):
+        '''
+        Atualiza o label do tempo com o tempo fornecido como parâmetro
+
+        :param tempo: String
+        '''
+        self.tempo_atual.set(tempo)
+
+    def reinicia_temporizador(self):
+        '''
+        Reinicia o temporizador e retorna a interface para o estado inicial
+        '''
+        self.inicia_temporizador()
         self.temporizador.reiniciar()
         self.tempo_atual.set(self.temporizador.get_tempo())
 
     # Threads
     def t_atualiza_tempo(self):
+        '''
+        Thread para atualizar o label de tempo na interface de acordo com o tempo no temporizador.
+        '''
+        # Loop do programa
         while(self.executando):
+            # Loop da temporização
             while (self.temporizando):
                 # Codigo para atualizar thread a partir do temporizador instanciado
                 temporizador_tempo = self.temporizador.get_tempo()
                 self.atualiza_tempo(temporizador_tempo)
+                
+                # Codição de parada
                 if (temporizador_tempo == '00:00'):
-                    print('para_temporizador()')
                     self.para_temporizador()
 
     def inicia_threads(self):
+        '''
+        Inicia threads do programa:
+        - t_atualiza_tempo
+        - root.main_loop
+        '''
         self.t_atualiza_tempo = th.Thread(target=self.t_atualiza_tempo)
         self.t_atualiza_tempo.start()
         self.iniciar()
 
     def __del__(self):
+        '''
+        Destrutor da classe
+        '''
         self.temporizador.finalizar()
         self.rodando = False
         self.executando = False
@@ -113,6 +137,9 @@ class Interface:
 
     # Main
     def iniciar(self):
+        '''
+        Função para rodar o loop principal do programa.
+        '''
         self.root.mainloop()
 
 if __name__ == '__main__':
