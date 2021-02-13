@@ -11,6 +11,7 @@ class Temporizador:
         self.executando = True
         self.temporizando = False
         self.reiniciado = False
+        self.parado = False
 
         # Tempo inicial
         self.min_inic = minutos
@@ -39,12 +40,16 @@ class Temporizador:
         if (self.temporizando):
             print('Ativado!')
         else:
-            print('Parado!')
+            print('Pausado!')
 
     def reiniciar(self):
+        self.executando = True
+        self.temporizando = False
+        self.reiniciado = True
+        self.parado = False
+        
         self.min_atual = self.min_inic
         self.seg_atual = self.seg_inic
-        self.reiniciado = True
         
         print("Reiniciado!")
         self.__printar_saida()
@@ -55,7 +60,7 @@ class Temporizador:
         """
         print('__temporizar()')
         while(self.executando):
-            while(self.temporizando):
+            while(self.temporizando and not self.parado):
                 time.sleep(1)
                 if (self.reiniciado):
                 #     continue
@@ -70,29 +75,13 @@ class Temporizador:
                     self.seg_atual = 59
                 else:
                     self.mudar_status()
+                    self.parado = True
                     print("Fim!")
-
-                
 
     def finalizar(self):
         self.temporizando = False
         self.executando = False
         print('Finalizado!')
-
-    # def __ler_entrada(self):
-    #     """
-    #     função que monitora o teclado e para o timer caso o usuário tecle a 'stopkey' 
-    #     """
-    #     # Tecla que inicia o timer 
-    #     # keyboard.add_hotkey(self.start_key, self.mudar_status)
-        
-    #     # Tecla que para o timer
-    #     keyboard.add_hotkey(self.stop_key, self.mudar_status)
-
-    #     keyboard.add_hotkey('esc', self.finalizar)
-
-    #     # Tecla para reiniciar o timer
-    #     keyboard.add_hotkey(self.restart_key, self.reiniciar)
 
     def __formatar_saida(self, minutos, segundos):
         """
