@@ -7,7 +7,7 @@ import time
 class Interface:
     def __init__(self, temporizador):
         self.executando = True
-        self.iniciado = False
+        self.temporizando = False
         self.temporizador = temporizador
 
         # self.mudar_status()
@@ -19,7 +19,7 @@ class Interface:
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
 
-        #Variáveis
+        # Variáveis
         self.tempo_atual = StringVar(value=temporizador.get_tempo())
         self.texto_botao = StringVar(value='Iniciar')
 
@@ -27,16 +27,21 @@ class Interface:
         self.content = Frame(self.root, width=200, height=300)
         self.content.grid(column=0, row=0, sticky=(N, E, S, W))
 
+        # Imagens
+        self.restart_icon = PhotoImage(file='./media/restart_icon_20px.png')
+
         # Widgets
-        self.button = Button(self.content, textvariable=self.texto_botao, command=self.mudar_status)
+        self.b_iniciar = Button(self.content, textvariable=self.texto_botao, command=self.mudar_status)
         self.txt_temporizador_1 = Label(self.content, textvariable=self.tempo_atual, width=5)
-        
+        self.b_reiniciar = Button(self.content, command=self.reinicia_temporizador, image=self.restart_icon)
 
-        # Showing Widgets
-        self.button.grid(column=1, row=1, sticky=(E))
-        self.txt_temporizador_1.grid(column=2, row=1, sticky=(W))
+        # Mostrando os Widgets
+        self.b_iniciar.grid(column=1, row=1, sticky=(E))
+        self.txt_temporizador_1.grid(column=2, row=1, sticky=(W, E))
+        self.b_reiniciar.grid(column=3, row=1, sticky=(W))
 
-        # Adding Padding
+        # Configurações Adicionais
+        self.b_reiniciar['state'] = DISABLED
         for child in self.content.winfo_children(): 
             child.grid_configure(padx=5, pady=5)
 
@@ -44,42 +49,63 @@ class Interface:
 
     # Funções
     def mudar_status(self):
-        if (self.iniciado):
+        self.b_reiniciar['state'] = NORMAL
+        if (self.temporizando):
             self.texto_botao.set('Iniciar')
-            self.iniciado = False
+            self.temporizando = False
+            self.temporizador.mudar_status()
         else:
             self.temporizador.mudar_status()
             self.texto_botao.set('Parar')
-            self.iniciado = True
+            self.temporizando = True
 
-        print('[DEBUG] iniciado = false')
+    def iniciar_temporizador(self):
+        self.texto_botao.set('Iniciar') 
+        self.temporizando = False
+        self.b_reiniciar['state'] = NORMAL
+
+    def para_temporizador(self):
+        self.b_iniciar['state'] = DISABLED
+        self.temporizando = False
+
+    def finaliza_temporizador(self):
+        self.temporizador.mudar_status()
+        self.texto_botao.set('Parar')
+        self.temporizando = True
 
     def atualiza_tempo(self, tempo):
         self.tempo_atual.set(tempo)
 
+    def reinicia_temporizador(self):
+        self.temporizando = False
+        self.texto_botao.set('Iniciar')
+
+        self.b_reiniciar['state'] = DISABLED
+        self.b_iniciar['state'] = NORMAL
+
+        self.temporizador.reiniciar()
+        self.tempo_atual.set(self.temporizador.get_tempo())
+
     # Threads
     def t_atualiza_tempo(self):
-        # print('[DEBUG] t_atualiza_tempo')
         while(self.executando):
-            # print('[DEBUG] t_atualiza_tempo EXECUTANDO')
-            while (self.iniciado):
-                # print('[DEBUG] t_atualiza_tempo INICIADO')
-
+            while (self.temporizando):
                 # Codigo para atualizar thread a partir do temporizador instanciado
-                self.atualiza_tempo(self.temporizador.get_tempo())
+                temporizador_tempo = self.temporizador.get_tempo()
+                self.atualiza_tempo(temporizador_tempo)
+                if (temporizador_tempo == '00:00'):
+                    print('para_temporizador()')
+                    self.para_temporizador()
 
     def inicia_threads(self):
-        # print('[DEBUG] inicia-threads')
         self.t_atualiza_tempo = th.Thread(target=self.t_atualiza_tempo)
         self.t_atualiza_tempo.start()
         self.iniciar()
 
     def __del__(self):
-        # print('[DEBUG] __del__')
         self.temporizador.finalizar()
         self.rodando = False
         self.executando = False
-        # print('[DEBUG] rodando = false')
         try:
             self.root.destroy()
         except:
@@ -87,11 +113,9 @@ class Interface:
 
     # Main
     def iniciar(self):
-        # print('[DEBUG] iniciar()')
         self.root.mainloop()
 
 if __name__ == '__main__':
 
-    t = temp.Temporizador(segundos=20)
+    t = temp.Temporizador(segundos=2)
     interface = Interface(t)
-
