@@ -3,15 +3,17 @@ import os
 import threading as th
 import keyboard
 import datetime
-import math 
+import math
 
 class Temporizador:
-    def __init__(self, master=None, stopkey='space', label='-', minutos=0, segundos=0):
+    def __init__(self, master=None, stopkey='space', label='-', minutos=0, segundos=0, log_dict={}, func_log=None):
         # Instanciação das variáveis
         self.executando = True
         self.temporizando = False
         self.reiniciado = False
         self.parado = False
+        self.l_dict = {'log_dict': log_dict}
+        self.log = func_log
 
         # Tempo inicial
         self.min_inic = minutos
@@ -32,15 +34,14 @@ class Temporizador:
         self.t_temporizador.start()
 
         print('\n')
-        self.__printar_saida()
 
     def mudar_status(self):
         self.temporizando = not self.temporizando
 
         if (self.temporizando):
-            print('[TEMPORIZADOR] Ativado!')
+            self.log('[TEMPORIZADOR] Ativado!')
         else:
-            print('[TEMPORIZADOR] Pausado!')
+            self.log('[TEMPORIZADOR] Pausado!')
 
     def reiniciar(self):
         self.executando = True
@@ -50,15 +51,12 @@ class Temporizador:
         
         self.min_atual = self.min_inic
         self.seg_atual = self.seg_inic
-        
-        print("[TEMPORIZADOR] Reiniciado!")
-        self.__printar_saida()
 
     def __temporizar(self):
-        """
+        """ 
         função que inicia o temporizador
         """
-        print('[TEMPORIZADOR] __temporizar()')
+        # self.log('[TEMPORIZADOR] __temporizar()')
         while(self.executando):
             while(self.temporizando and not self.parado):
                 time.sleep(1)
@@ -76,12 +74,12 @@ class Temporizador:
                 else:
                     self.mudar_status()
                     self.parado = True
-                    print("[TEMPORIZADOR] Fim!")
+                    self.log("[TEMPORIZADOR] Fim!")
 
     def finalizar(self):
         self.temporizando = False
         self.executando = False
-        print('[TEMPORIZADOR] Finalizado!')
+        self.log('[TEMPORIZADOR] Finalizado!')
 
     def __formatar_saida(self, minutos, segundos):
         """
@@ -111,13 +109,6 @@ class Temporizador:
         return self.executando
 
     def temporizando(self):
-        return self.temporizando
-
-    def __printar_saida(self):
-        print('[TEMPORIZADOR] '+self.label + ': ' + self.__formatar_saida(self.min_atual, self.seg_atual))
-
-    def __printar_comandos(self):
-        print('[TEMPORIZADOR] espaço -> On/Off\nr -> reinicia o timer\nesc -> finaliza o timer\n')
 
 if __name__ == '__main__':
     temp1 = Temporizador(label='temporizador-1', minutos=1, segundos=0)

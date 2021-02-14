@@ -5,12 +5,16 @@ import threading as th
 import time
 
 class Interface:
-    def __init__(self, temporizador):
+    def __init__(self):
+        # Log
+        self.log_dict = {
+            'texto':'-'
+        }
+
+        # Variáveis
         self.executando = True
         self.temporizando = False
-        self.temporizador = temporizador
-
-        # self.mudar_status()
+        self.temporizador = temp.Temporizador(segundos=15, log_dict=self.log_dict, func_log=self.log_txt)
 
         # Root
         self.root = mtTkinter.Tk()
@@ -20,7 +24,7 @@ class Interface:
         self.root.rowconfigure(0, weight=1)
 
         # Variáveis
-        self.tempo_atual = StringVar(value=temporizador.get_tempo())
+        self.tempo_atual = StringVar(value=self.temporizador.get_tempo())
         self.texto_botao = StringVar(value='Iniciar')
         self.log = StringVar(value='-')
 
@@ -99,7 +103,7 @@ class Interface:
         '''
         self.inicia_temporizador()
         self.temporizador.reiniciar()
-        self.tempo_atual.set(self.temporizador.get_tempo())
+        self.atualiza_tempo(self.temporizador.get_tempo())
 
     # Threads
     def t_atualiza_tempo(self):
@@ -129,7 +133,13 @@ class Interface:
         self.iniciar()
 
     def log_txt(self, txt):
-        self.log.set(txt)
+        '''
+        Imprime a mensagem na label 'log' da interface.
+
+        :param txt: String
+        '''
+        self.log_dict['texto'] = txt
+        self.log.set(self.log_dict['texto'])
 
     def __del__(self):
         '''
@@ -151,6 +161,4 @@ class Interface:
         self.root.mainloop()
 
 if __name__ == '__main__':
-
-    t = temp.Temporizador(segundos=2)
-    interface = Interface(t)
+    interface = Interface()
