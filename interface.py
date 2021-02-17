@@ -5,12 +5,16 @@ import threading as th
 import time
 
 class Interface:
-    def __init__(self, temporizador):
+    def __init__(self):
+        # Log
+        self.log_dict = {
+            'texto':'-'
+        }
+
+        # Variáveis
         self.executando = True
         self.temporizando = False
-        self.temporizador = temporizador
-
-        # self.mudar_status()
+        self.temporizador = temp.Temporizador(segundos=15, log_dict=self.log_dict, func_log=self.log_txt)
 
         # Root
         self.root = mtTkinter.Tk()
@@ -21,8 +25,9 @@ class Interface:
         self.root.rowconfigure(0, weight=1)
 
         # Variáveis
-        self.tempo_atual = StringVar(value=temporizador.get_tempo())
+        self.tempo_atual = StringVar(value=self.temporizador.get_tempo())
         self.texto_botao = StringVar(value='Iniciar')
+        self.log = StringVar(value='-')
 
         # Frame
         self.content = Frame(self.root, width=200, height=300)
@@ -35,11 +40,13 @@ class Interface:
         self.b_iniciar = Button(self.content, textvariable=self.texto_botao, command=self.mudar_status)
         self.txt_temporizador_1 = Label(self.content, textvariable=self.tempo_atual, width=5)
         self.b_reiniciar = Button(self.content, command=self.reinicia_temporizador, image=self.restart_icon)
+        self.log_label = Label(self.content, textvariable=self.log)
 
         # Mostrando os Widgets
         self.b_iniciar.grid(column=1, row=1, sticky=(E))
         self.txt_temporizador_1.grid(column=2, row=1, sticky=(W, E))
         self.b_reiniciar.grid(column=3, row=1, sticky=(W))
+        self.log_label.grid(column=2, row=2, sticky=(N))
 
         # Configurações Adicionais
         for child in self.content.winfo_children(): 
@@ -68,6 +75,8 @@ class Interface:
         '''
         Coloca o temporizador no seu estado inicial.
         '''
+        self.log_txt('[INTERFACE] inicia_temporizador()')
+
         self.texto_botao.set('Iniciar') 
         self.temporizando = False
         self.b_reiniciar['state'] = DISABLED
@@ -95,7 +104,7 @@ class Interface:
         '''
         self.inicia_temporizador()
         self.temporizador.reiniciar()
-        self.tempo_atual.set(self.temporizador.get_tempo())
+        self.atualiza_tempo(self.temporizador.get_tempo())
 
     # Threads
     def t_atualiza_tempo(self):
@@ -124,6 +133,15 @@ class Interface:
         self.t_atualiza_tempo.start()
         self.iniciar()
 
+    def log_txt(self, txt):
+        '''
+        Imprime a mensagem na label 'log' da interface.
+
+        :param txt: String
+        '''
+        self.log_dict['texto'] = txt
+        self.log.set(self.log_dict['texto'])
+
     def __del__(self):
         '''
         Destrutor da classe
@@ -144,6 +162,4 @@ class Interface:
         self.root.mainloop()
 
 if __name__ == '__main__':
-
-    t = temp.Temporizador(segundos=2)
-    interface = Interface(t)
+    interface = Interface()
