@@ -13,10 +13,11 @@ class Interface:
         # Root
         self.root = Tk()
         self.root.title('Timer.py')
+        root.attributes('-type', 'dialog') # Abre em uma janela no i3-wm
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
 
-        #Variáveis
+        # Variáveis
         self.tempo_atual = StringVar(value='00:00')
         self.texto_botao = StringVar(value='Iniciar')
 
