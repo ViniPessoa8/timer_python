@@ -1,2 +1,2 @@
 # timer_python
-Um timer e Cronômetro desenvolvido em Python com o Tkinter, para fins educacionais.
+Um timer e Cronômetro desenvolvido em Python com o Tkinter.
